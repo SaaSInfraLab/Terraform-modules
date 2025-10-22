@@ -108,14 +108,9 @@ resource "aws_security_group" "eks_cluster" {
   description = "Security group for EKS control plane"
   vpc_id      = aws_vpc.main.id
 
-  // Allow incoming traffic from nodes on ephemeral ports (recommended for Kubernetes)
-  ingress {
-    description      = "Allow node -> cluster communication"
-    from_port        = 1025
-    to_port          = 65535
-    protocol         = "tcp"
-    security_groups  = [aws_security_group.eks_nodes.id]
-  }
+  # Note: ingress rules that reference another security group are created
+  # below as separate aws_security_group_rule resources to avoid a circular
+  # dependency between the two security groups.
 
   egress {
     from_port   = 0
@@ -131,15 +126,6 @@ resource "aws_security_group" "eks_nodes" {
   name        = "${var.name_prefix}-eks-nodes-sg"
   description = "Security group for EKS worker nodes"
   vpc_id      = aws_vpc.main.id
-
-  // Allow cluster API (from control plane) to nodes
-  ingress {
-    description     = "Allow cluster API to nodes"
-    from_port       = 443
-    to_port         = 443
-    protocol        = "tcp"
-    security_groups = [aws_security_group.eks_cluster.id]
-  }
 
   // Allow node to node communication
   ingress {
@@ -170,6 +156,28 @@ resource "aws_security_group" "eks_nodes" {
   }
 
   tags = merge({ Name = "${var.name_prefix}-eks-nodes-sg" }, var.tags)
+}
+
+// Security group rule: allow nodes -> cluster on ephemeral ports
+resource "aws_security_group_rule" "cluster_from_nodes" {
+  type                     = "ingress"
+  from_port                = 1025
+  to_port                  = 65535
+  protocol                 = "tcp"
+  security_group_id        = aws_security_group.eks_cluster.id
+  source_security_group_id = aws_security_group.eks_nodes.id
+  description              = "Allow node -> cluster communication"
+}
+
+// Security group rule: allow cluster -> nodes for Kubernetes API (443)
+resource "aws_security_group_rule" "nodes_from_cluster" {
+  type                     = "ingress"
+  from_port                = 443
+  to_port                  = 443
+  protocol                 = "tcp"
+  security_group_id        = aws_security_group.eks_nodes.id
+  source_security_group_id = aws_security_group.eks_cluster.id
+  description              = "Allow cluster API to nodes"
 }
 
 // CloudWatch Log Group for VPC Flow Logs
