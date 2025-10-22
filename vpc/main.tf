@@ -166,7 +166,7 @@ resource "aws_security_group_rule" "cluster_from_nodes" {
   protocol                 = "tcp"
   security_group_id        = aws_security_group.eks_cluster.id
   source_security_group_id = aws_security_group.eks_nodes.id
-  description              = "Allow node -> cluster communication"
+  description              = "Allow node to cluster communication"
 }
 
 // Security group rule: allow cluster -> nodes for Kubernetes API (443)
