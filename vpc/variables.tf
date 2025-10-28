@@ -58,3 +58,9 @@ variable "flow_log_retention_in_days" {
 	default     = 90
 }
 
+variable "vpc_flow_logs_role_arn" {
+  description = "Optional ARN of an existing IAM role to use for VPC Flow Logs. If empty, the module will create a role when flow logs are enabled."
+  type        = string
+  default     = ""
+}
+

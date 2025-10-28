@@ -38,6 +38,11 @@ output "vpc_flow_log_id" {
   value       = try(aws_flow_log.vpc[0].id, null)
 }
 
+output "vpc_flow_logs_role_arn" {
+  description = "ARN of the IAM role used for VPC Flow Logs (passed from iam module)"
+  value       = var.vpc_flow_logs_role_arn
+}
+
 output "vpc_flow_log_log_group_arn" {
   description = "ARN of the CloudWatch Log Group used for VPC Flow Logs"
   value       = try(aws_cloudwatch_log_group.vpc_flow_logs[0].arn, null)
