@@ -4,13 +4,13 @@
 
 aws_region   = "us-east-1"
 environment  = "dev"
-project_name = "SaasInfalab"
-name_prefix  = "saasinfalab-dev"
+project_name = "SaasInfralab"
+name_prefix  = "saasinfralab-dev"
 
 # ============================================================================
 # Cluster Configuration
 # ============================================================================
-cluster_name    = "saasinfalab-dev"
+cluster_name    = "saasinfralab-dev"
 cluster_version = "1.29"
 
 # ============================================================================
@@ -52,38 +52,39 @@ log_retention_days        = 7
 enable_security_alarms    = true
 
 # ============================================================================
-# Multi-Tenancy Configuration
+# Multi-Tenancy Configuration (Temporarily disabled)
 # ============================================================================
 # Define tenants with their resource limits
-tenants = [
-  {
-    name                  = "saasinfalab-platform"
-    namespace             = "saasinfalab-platform"
-    cpu_limit             = "5"
-    memory_limit          = "10Gi"
-    pod_limit             = "100"
-    storage_limit         = "50Gi"
-    enable_network_policy = true
-  },
-  {
-    name                  = "team-data"
-    namespace             = "team-data"
-    cpu_limit             = "10"
-    memory_limit          = "20Gi"
-    pod_limit             = "150"
-    storage_limit         = "100Gi"
-    enable_network_policy = true
-  },
-  {
-    name                  = "team-analytics"
-    namespace             = "team-analytics"
-    cpu_limit             = "8"
-    memory_limit          = "16Gi"
-    pod_limit             = "120"
-    storage_limit         = "200Gi"
-    enable_network_policy = true
-  }
-]
+tenants = []
+# tenants = [
+#   {
+#     name                  = "saasinfralab-platform"
+#     namespace             = "saasinfralab-platform"
+#     cpu_limit             = "5"
+#     memory_limit          = "10Gi"
+#     pod_limit             = "100"
+#     storage_limit         = "50Gi"
+#     enable_network_policy = true
+#   },
+#   {
+#     name                  = "team-data"
+#     namespace             = "team-data"
+#     cpu_limit             = "10"
+#     memory_limit          = "20Gi"
+#     pod_limit             = "150"
+#     storage_limit         = "100Gi"
+#     enable_network_policy = true
+#   },
+#   {
+#     name                  = "team-analytics"
+#     namespace             = "team-analytics"
+#     cpu_limit             = "8"
+#     memory_limit          = "16Gi"
+#     pod_limit             = "120"
+#     storage_limit         = "200Gi"
+#     enable_network_policy = true
+#   }
+# ]
 
 # ============================================================================
 # Tags
