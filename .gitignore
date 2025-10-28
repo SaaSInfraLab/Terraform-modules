@@ -1,3 +1,13 @@
-*.terraform
+.terraform
 .terraform.lock.hcl
 .terraformrc
+# Ignore Terraform state files and backups
+*.tfstate
+*.tfstate.backup
+
+# Ignore local tfvars (may contain secrets)
+*.tfvars
+
+# Ignore provider and credential overrides
+.terraform.tfstate.d
+.terraform.lock.hcl
