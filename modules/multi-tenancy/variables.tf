@@ -3,6 +3,12 @@ variable "cluster_name" {
   type        = string
 }
 
+variable "aws_region" {
+  description = "AWS region where the cluster is deployed"
+  type        = string
+  default     = "us-east-1"
+}
+
 variable "enable_rbac" {
   description = "Enable RBAC for multi-tenancy"
   type        = bool

@@ -1,0 +1,181 @@
+name: 'Terraform CI/CD'
+
+on:
+  push:
+    branches: [ "main" ]
+  pull_request:
+    branches: [ "main" ]
+  workflow_dispatch:
+    inputs:
+      action:
+        description: 'Action to perform'
+        required: true
+        default: 'plan'
+        type: choice
+        options:
+        - plan
+        - apply
+        - destroy
+
+permissions:
+  id-token: write  # Required for OIDC
+  contents: read
+
+jobs:
+  terraform-infrastructure:
+    name: 'Infrastructure Phase'
+    runs-on: ubuntu-latest
+    environment: production
+    
+    # Use the Bash shell regardless whether the GitHub Actions runner is ubuntu-latest, macos-latest, or windows-latest
+    defaults:
+      run:
+        shell: bash
+        working-directory: infrastructure
+    
+    steps:
+    # Checkout the repository to the GitHub Actions runner
+    - name: Checkout
+      uses: actions/checkout@v4
+
+    # Install the latest version of Terraform CLI and configure the Terraform CLI configuration file with a Terraform Cloud user API token
+    - name: Setup Terraform
+      uses: hashicorp/setup-terraform@v3
+      with:
+        terraform_version: "1.9.5"
+
+    # Configure AWS credentials using OIDC
+    - name: Configure AWS credentials
+      uses: aws-actions/configure-aws-credentials@v4
+      with:
+        role-to-assume: arn:aws:iam::821368347884:role/GitHubActions-SaaSInfraLab-Role
+        role-session-name: GitHubActions-Infrastructure
+        aws-region: us-west-2
+
+    # Initialize a new or existing Terraform working directory by creating initial files, loading any remote state, downloading modules, etc.
+    - name: Terraform Init
+      run: terraform init
+
+    # Checks that all Terraform configuration files adhere to a canonical format
+    - name: Terraform Format
+      run: terraform fmt -check
+
+    # Validates the configuration files in a directory, referring only to the configuration and not accessing any remote services
+    - name: Terraform Validate
+      run: terraform validate
+
+    # Generates an execution plan for Terraform
+    - name: Terraform Plan
+      run: terraform plan -var-file="../examples/dev-environment/infrastructure.tfvars" -input=false
+      
+    # On push to "main", build or change infrastructure according to Terraform configuration files
+    # Note: It is recommended to set up a required "strict" status check in your repository for "Terraform Cloud". See the documentation on "strict" required status checks for more information: https://help.github.com/en/github/administering-a-repository/types-of-required-status-checks
+    - name: Terraform Apply
+      if: github.ref == 'refs/heads/main' && (github.event_name == 'push' || github.event.inputs.action == 'apply')
+      run: terraform apply -var-file="../examples/dev-environment/infrastructure.tfvars" -auto-approve -input=false
+
+    # Destroy infrastructure when manually triggered
+    - name: Terraform Destroy Infrastructure
+      if: github.event.inputs.action == 'destroy'
+      run: terraform destroy -var-file="../examples/dev-environment/infrastructure.tfvars" -auto-approve -input=false
+
+    # Upload the Terraform state file as an artifact for the tenants phase
+    - name: Upload Infrastructure State
+      if: github.ref == 'refs/heads/main' && (github.event_name == 'push' || github.event.inputs.action == 'apply')
+      uses: actions/upload-artifact@v4
+      with:
+        name: infrastructure-state
+        path: infrastructure/terraform.tfstate
+        retention-days: 1
+
+  terraform-tenants:
+    name: 'Tenants Phase'
+    runs-on: ubuntu-latest
+    environment: production
+    needs: terraform-infrastructure
+    if: github.ref == 'refs/heads/main' && (github.event_name == 'push' || github.event.inputs.action == 'apply')
+    
+    defaults:
+      run:
+        shell: bash
+        working-directory: tenants
+    
+    steps:
+    # Checkout the repository to the GitHub Actions runner
+    - name: Checkout
+      uses: actions/checkout@v4
+
+    # Install the latest version of Terraform CLI
+    - name: Setup Terraform
+      uses: hashicorp/setup-terraform@v3
+      with:
+        terraform_version: "1.9.5"
+
+    # Configure AWS credentials using OIDC
+    - name: Configure AWS credentials
+      uses: aws-actions/configure-aws-credentials@v4
+      with:
+        role-to-assume: arn:aws:iam::821368347884:role/GitHubActions-SaaSInfraLab-Role
+        role-session-name: GitHubActions-Tenants
+        aws-region: us-west-2
+
+    # Download the infrastructure state file
+    - name: Download Infrastructure State
+      uses: actions/download-artifact@v4
+      with:
+        name: infrastructure-state
+        path: infrastructure/
+
+    # Initialize Terraform for tenants
+    - name: Terraform Init
+      run: terraform init
+
+    # Validate tenant configuration
+    - name: Terraform Validate
+      run: terraform validate
+
+    # Plan tenant deployment
+    - name: Terraform Plan
+      run: terraform plan -var-file="../examples/dev-environment/tenants.tfvars" -input=false
+
+    # Apply tenant configuration
+    - name: Terraform Apply
+      run: terraform apply -var-file="../examples/dev-environment/tenants.tfvars" -auto-approve -input=false
+
+  terraform-destroy-tenants:
+    name: 'Destroy Tenants Phase'
+    runs-on: ubuntu-latest
+    environment: production
+    if: github.event.inputs.action == 'destroy'
+    
+    defaults:
+      run:
+        shell: bash
+        working-directory: tenants
+    
+    steps:
+    # Checkout the repository to the GitHub Actions runner
+    - name: Checkout
+      uses: actions/checkout@v4
+
+    # Install the latest version of Terraform CLI
+    - name: Setup Terraform
+      uses: hashicorp/setup-terraform@v3
+      with:
+        terraform_version: "1.9.5"
+
+    # Configure AWS credentials using OIDC
+    - name: Configure AWS credentials
+      uses: aws-actions/configure-aws-credentials@v4
+      with:
+        role-to-assume: arn:aws:iam::821368347884:role/GitHubActions-SaaSInfraLab-Role
+        role-session-name: GitHubActions-Destroy
+        aws-region: us-west-2
+
+    # Initialize Terraform for tenants
+    - name: Terraform Init
+      run: terraform init
+
+    # Destroy tenant configuration first (before infrastructure)
+    - name: Terraform Destroy Tenants
+      run: terraform destroy -var-file="../examples/dev-environment/tenants.tfvars" -auto-approve -input=false

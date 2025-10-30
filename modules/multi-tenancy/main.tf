@@ -45,14 +45,6 @@ resource "kubernetes_resource_quota" "tenant" {
       "pods"            = each.value.pod_limit
       "requests.storage" = each.value.storage_limit
     }
-
-    scope_selector {
-      match_expression {
-        operator       = "In"
-        scope_name     = "PriorityClass"
-        values         = ["default"]
-      }
-    }
   }
 
   depends_on = [
@@ -188,6 +180,11 @@ resource "kubernetes_role_binding" "tenant_admin" {
 resource "null_resource" "cluster_ready" {
   triggers = {
     cluster_id = var.cluster_name
+  }
+
+  provisioner "local-exec" {
+    command = "aws eks wait cluster-active --region ${var.aws_region} --name ${var.cluster_name}; Start-Sleep -Seconds 30"
+    interpreter = ["PowerShell", "-Command"]
   }
 }
 

@@ -14,8 +14,8 @@ output "private_subnet_ids" {
 }
 
 output "nat_gateway_ids" {
-  description = "IDs of NAT gateways"
-  value       = aws_nat_gateway.nat[*].id
+  description = "List of NAT Gateway IDs"
+  value       = [for ngw in aws_nat_gateway.nat : ngw.id]
 }
 
 output "eks_cluster_sg_id" {

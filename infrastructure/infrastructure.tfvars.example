@@ -1,0 +1,82 @@
+# Copy this file to infrastructure.tfvars and customize for your environment
+
+# =============================================================================
+# CORE CONFIGURATION
+# =============================================================================
+
+aws_region  = "us-east-1"
+environment = "dev"
+
+# =============================================================================
+# EKS CLUSTER CONFIGURATION
+# =============================================================================
+
+cluster_name    = "saasinfralab-dev"
+cluster_version = "1.31"
+
+# Cluster endpoint access (both enabled for development)
+cluster_endpoint_config = {
+  private_access      = true
+  public_access       = true
+  public_access_cidrs = ["0.0.0.0/0"]  # Restrict this in production
+}
+
+# =============================================================================
+# NETWORK CONFIGURATION
+# =============================================================================
+
+vpc_cidr           = "10.0.0.0/16"
+availability_zones = ["us-east-1a", "us-east-1b", "us-east-1c"]
+
+# =============================================================================
+# NODE GROUP CONFIGURATION (FREE TIER OPTIMIZED)
+# =============================================================================
+
+node_group_config = {
+  instance_types = ["t3.micro"]    # Free tier eligible
+  capacity_type  = "ON_DEMAND"
+  disk_size      = 20
+  ami_type       = "AL2023_x86_64_STANDARD"  # Amazon Linux 2023 (AL2 deprecated Nov 26, 2025)
+  scaling_config = {
+    desired_size = 2               # Start with 2 nodes
+    max_size     = 4               # Scale up to 4 nodes
+    min_size     = 1               # Minimum 1 node
+  }
+}
+
+# =============================================================================
+# MONITORING & LOGGING
+# =============================================================================
+
+enable_monitoring    = true
+log_retention_days   = 7           # Keep logs for 7 days (cost effective)
+
+# =============================================================================
+# SECURITY SETTINGS
+# =============================================================================
+
+enable_flow_logs     = true        # Enable VPC flow logs for security
+enable_encryption    = true        # Encrypt EBS volumes and secrets
+
+# =============================================================================
+# PRODUCTION OVERRIDES
+# =============================================================================
+
+# For production environments, consider:
+# cluster_endpoint_config = {
+#   private_access      = true
+#   public_access       = false     # Disable public access
+#   public_access_cidrs = []
+# }
+# 
+# node_group_config = {
+#   instance_types = ["t3.medium", "t3.large"]  # Larger instances
+#   capacity_type  = "SPOT"                     # Use spot instances for cost
+#   scaling_config = {
+#     desired_size = 3
+#     max_size     = 10
+#     min_size     = 2
+#   }
+# }
+# 
+# log_retention_days = 30                       # Longer retention

@@ -1,0 +1,87 @@
+# Copy this file to tenants.tfvars and customize for your environment
+
+# =============================================================================
+# CORE CONFIGURATION
+# =============================================================================
+
+aws_region  = "us-east-1"
+environment = "dev"
+
+# =============================================================================
+# TENANT CONFIGURATIONS
+# =============================================================================
+
+tenants = [
+  # Platform team - Higher resource limits for core services
+  {
+    name                  = "saasinfralab-platform"
+    namespace             = "saasinfralab-platform"
+    cpu_limit             = "20"        # 20 CPU cores
+    memory_limit          = "40Gi"      # 40GB RAM
+    pod_limit             = 200         # 200 pods max
+    storage_limit         = "200Gi"     # 200GB storage
+    enable_network_policy = true        # Enable network isolation
+  },
+  
+  # Data team - Medium resource allocation
+  {
+    name                  = "team-data"
+    namespace             = "team-data"
+    cpu_limit             = "10"        # 10 CPU cores
+    memory_limit          = "20Gi"      # 20GB RAM
+    pod_limit             = 150         # 150 pods max
+    storage_limit         = "100Gi"     # 100GB storage
+    enable_network_policy = true        # Enable network isolation
+  },
+  
+  # Analytics team - Higher compute and storage for data processing
+  {
+    name                  = "team-analytics"
+    namespace             = "team-analytics"
+    cpu_limit             = "15"        # 15 CPU cores
+    memory_limit          = "30Gi"      # 30GB RAM
+    pod_limit             = 180         # 180 pods max
+    storage_limit         = "150Gi"     # 150GB storage
+    enable_network_policy = true        # Enable network isolation
+  }
+]
+
+# =============================================================================
+# ADVANCED FEATURES
+# =============================================================================
+
+enable_pod_security_policies  = false   # Disable PSPs (deprecated in K8s 1.25+)
+enable_monitoring_per_tenant  = true    # Enable per-tenant monitoring
+default_storage_class         = "gp2"   # Use GP2 storage class
+
+# =============================================================================
+# PRODUCTION CONSIDERATIONS
+# =============================================================================
+
+# For production environments, consider:
+# 
+# 1. Resource Limits:
+#    - Increase CPU/Memory limits based on workload requirements
+#    - Set appropriate pod limits to prevent resource exhaustion
+#    - Monitor storage usage and adjust limits accordingly
+#
+# 2. Security:
+#    - Enable Pod Security Standards instead of PSPs
+#    - Implement additional network policies for egress control
+#    - Use dedicated service accounts for each tenant
+#
+# 3. Monitoring:
+#    - Set up per-tenant dashboards and alerts
+#    - Monitor resource utilization and quota usage
+#    - Implement cost tracking per tenant
+#
+# Example production tenant:
+# {
+#   name                  = "production-tenant"
+#   namespace             = "prod-tenant"
+#   cpu_limit             = "50"          # Higher limits for production
+#   memory_limit          = "100Gi"
+#   pod_limit             = 500
+#   storage_limit         = "1Ti"         # Terabyte storage
+#   enable_network_policy = true
+# }
