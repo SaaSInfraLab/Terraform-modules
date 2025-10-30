@@ -63,12 +63,11 @@ cloudnative-saas-eks/
 │       └── README.md               # Deployment guide
 │
 ├── 🚀 .github/workflows/           # CI/CD automation
-│   └── terraform.yml               # GitHub Actions workflow
+│   └── CI-CD.yml               # GitHub Actions workflow
 │
-└── 📖 docs/                        # Documentation
-    ├── architecture.md             # Detailed architecture
-    ├── getting-started.md          # Quick start guide
-    └── troubleshooting.md          # Common issues
+└── 📖 docs/                             # Documentation
+    ├── github-actions-oidc-complete.md  # Quick setup for OIDC
+    └── github-actions-setup.md          # Quick start guide for github actions
 ```
 
 ---
