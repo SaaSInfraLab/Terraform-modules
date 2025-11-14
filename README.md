@@ -309,21 +309,6 @@ tenants = [
 4. Push branch (`git push origin feature/amazing-feature`)
 5. Open Pull Request
 
----
-
-## 📄 License
-
-This project is licensed under the MIT License - see the [LICENSE](LICENSE) file for details.
-
----
-
-## 🆘 Support
-
-- **Issues**: [GitHub Issues](../../issues)
-- **Discussions**: [GitHub Discussions](../../discussions)
-- **Documentation**: [docs/](docs/)
-
----
 
 <div align="center">
 
