@@ -29,7 +29,7 @@ This platform provides a complete multi-tenant SaaS infrastructure solution buil
 ## 📁 Project Structure
 
 ```
-cloudnative-saas-eks/
+Terraform-modules/
 ├── 📚 modules/                     # Reusable Terraform modules
 │   ├── vpc/                        # Network foundation
 │   ├── iam/                        # Identity & access management  
