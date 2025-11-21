@@ -7,10 +7,6 @@
 
 > **Production-ready, multi-tenant SaaS infrastructure on AWS EKS with complete isolation, security, and cost optimization.**
 
-## ⚠️ Important Update - Amazon Linux 2023
-
-**This repository has been updated to use Amazon Linux 2023** due to Amazon Linux 2 support ending on **November 26, 2025**. All configurations now use `AL2023_x86_64_STANDARD` AMI type.
-
 ## 🏗️ Architecture Overview
 
 This platform provides a complete multi-tenant SaaS infrastructure solution built on AWS EKS, designed for teams that need secure tenant isolation, resource governance, and scalable operations.
