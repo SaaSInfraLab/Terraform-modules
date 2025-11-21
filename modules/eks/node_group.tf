@@ -96,14 +96,15 @@ resource "aws_eks_node_group" "main" {
   depends_on = [
     aws_eks_cluster.main,
     aws_launch_template.nodes,
-    aws_iam_instance_profile.nodes
+    aws_iam_instance_profile.nodes[0]
   ]
 }
 
 // Instance profile for nodes (created by IAM module, referenced here)
 resource "aws_iam_instance_profile" "nodes" {
+  count      = var.node_iam_role_arn != null ? 1 : 0
   name_prefix = "${var.cluster_name}-"
-  role        = data.aws_iam_role.node_role.name
+  role        = data.aws_iam_role.node_role[0].name
 
   depends_on = [
     data.aws_iam_role.node_role
@@ -112,5 +113,6 @@ resource "aws_iam_instance_profile" "nodes" {
 
 // Data source to reference the node IAM role (passed in as ARN)
 data "aws_iam_role" "node_role" {
-  name = split("/", var.node_iam_role_arn)[1]
+  count = var.node_iam_role_arn != null ? 1 : 0
+  name  = var.node_iam_role_arn != null ? split("/", var.node_iam_role_arn)[1] : null
 }

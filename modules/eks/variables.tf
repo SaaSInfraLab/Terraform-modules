@@ -4,8 +4,9 @@ variable "cluster_iam_role_arn" {
 }
 
 variable "node_iam_role_arn" {
-  description = "ARN of the IAM role for EKS worker nodes (from iam module)"
+  description = "ARN of the IAM role for EKS worker nodes (from iam module). Required for node group creation."
   type        = string
+  default     = null
 }
 
 variable "cluster_name" {
