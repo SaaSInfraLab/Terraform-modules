@@ -23,19 +23,7 @@ This directory contains a complete, ready-to-deploy example configuration for se
 
 ## Quick Start
 
-### Option 1: GitHub Actions (Recommended)
-
-1. **Configure Repository Secrets** (if not already done):
-   ```
-   AWS_ACCESS_KEY_ID=your_aws_access_key  
-   AWS_SECRET_ACCESS_KEY=your_aws_secret_key
-   ```
-
-2. **Deploy via GitHub Actions**:
-   - Push to main branch for automatic deployment
-   - Or use manual workflow trigger in GitHub Actions tab
-
-### Option 2: Manual Deployment
+### Manual Deployment
 
 ```bash
 # From the repository root directory
@@ -106,7 +94,7 @@ kubectl describe resourcequota -n team-data
 ```hcl
 # Core settings
 cluster_name = "saasinfralab-dev"
-cluster_version = "1.31"
+cluster_version = "1.32"
 vpc_cidr = "10.0.0.0/16"
 
 # Free tier optimized with Amazon Linux 2023

@@ -62,7 +62,7 @@ environment = "dev"
 
 # EKS cluster
 cluster_name    = "saasinfralab-dev"
-cluster_version = "1.31"
+cluster_version = "1.32"
 
 # Network settings
 vpc_cidr           = "10.0.0.0/16"
@@ -170,10 +170,11 @@ terraform output
 - **main.tf**: Main infrastructure configuration
 - **variables.tf**: Input variable definitions
 - **outputs.tf**: Output values for next phase
-- **versions.tf**: Terraform and provider requirements
+- **terraform.tf**: Terraform and provider requirements
 - **backend.tf**: State backend configuration
-- **infrastructure.tfvars**: Example configuration values
 - **README.md**: This documentation
+
+**Note**: Example configuration files are available in `examples/dev-environment/infrastructure.tfvars`
 
 ---
 

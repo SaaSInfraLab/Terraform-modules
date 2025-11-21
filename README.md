@@ -9,7 +9,7 @@
 
 ## ⚠️ Important Update - Amazon Linux 2023
 
-**This repository has been updated to use Amazon Linux 2023** due to Amazon Linux 2 support ending on **November 26, 2025**. All configurations now use `AL2023_x86_64_STANDARD` AMI type. See [migration guide](docs/amazon-linux-2023-migration.md) for details.
+**This repository has been updated to use Amazon Linux 2023** due to Amazon Linux 2 support ending on **November 26, 2025**. All configurations now use `AL2023_x86_64_STANDARD` AMI type.
 
 ## 🏗️ Architecture Overview
 
@@ -44,7 +44,6 @@ Terraform-modules/
 │   ├── outputs.tf                  # Resource information
 │   ├── terraform.tf                # Terraform/provider requirements
 │   ├── backend.tf                  # State management
-│   ├── infrastructure.tfvars.example
 │   └── README.md                   # Phase 1 documentation
 │
 ├── 👥 tenants/                     # Phase 2: Multi-Tenancy  
@@ -56,18 +55,11 @@ Terraform-modules/
 │   ├── tenants.tfvars.example
 │   └── README.md                   # Phase 2 documentation
 │
-├── 💡 examples/
-│   └── dev-environment/            # Complete working example
-│       ├── infrastructure.tfvars   # Example infrastructure config
-│       ├── tenants.tfvars          # Example tenant config  
-│       └── README.md               # Deployment guide
-│
-├── 🚀 .github/workflows/           # CI/CD automation
-│   └── CI-CD.yml               # GitHub Actions workflow
-│
-└── 📖 docs/                             # Documentation
-    ├── github-actions-oidc-complete.md  # Quick setup for OIDC
-    └── github-actions-setup.md          # Quick start guide for github actions
+└── 💡 examples/
+    └── dev-environment/            # Complete working example
+        ├── infrastructure.tfvars   # Example infrastructure config
+        ├── tenants.tfvars          # Example tenant config  
+        └── README.md               # Deployment guide
 ```
 
 ---
@@ -81,54 +73,12 @@ Terraform-modules/
 - AWS CLI (configured)
 - Terraform >= 1.0  
 - kubectl
-- GitHub repository with Actions enabled
 
 # Verify setup
 aws sts get-caller-identity
 terraform version
 kubectl version --client
 ```
-
-### GitHub Actions Deployment (Recommended)
-
-This repository includes a complete GitHub Actions workflow for automated deployment:
-
-#### 1. Repository Setup
-```bash
-# Fork or clone this repository to your GitHub account
-git clone <your-repository-url>
-cd terraform-modules
-```
-
-#### 2. Configure GitHub Secrets
-In your GitHub repository, go to Settings → Secrets and variables → Actions and add:
-
-```
-AWS_ACCESS_KEY_ID=your_aws_access_key
-AWS_SECRET_ACCESS_KEY=your_aws_secret_key
-```
-
-#### 3. Automated Deployment Options
-
-**Option A: Push to Main Branch**
-```bash
-# Any push to main branch will automatically:
-# 1. Plan and validate Terraform
-# 2. Deploy infrastructure phase
-# 3. Deploy tenants phase
-git push origin main
-```
-
-**Option B: Manual Workflow Trigger**
-1. Go to GitHub Actions tab in your repository
-2. Select "Terraform CI/CD" workflow
-3. Click "Run workflow"
-4. Choose action: `plan`, `apply`, or `destroy`
-
-#### 4. Monitoring Deployment
-- View progress in GitHub Actions tab
-- Each phase runs separately for clear visibility
-- Automatic state management between phases
 
 ### Manual Deployment (Advanced)
 
@@ -149,15 +99,6 @@ terraform apply -var-file="../examples/dev-environment/tenants.tfvars"
 kubectl get nodes
 kubectl get namespaces
 ```
-
-### CI/CD Workflow Features
-
-- **✅ Automated Validation**: Format, validate, and plan checks
-- **🔄 Two-Phase Deployment**: Infrastructure → Tenants with proper dependencies
-- **🛡️ Safe Destruction**: Tenants destroyed before infrastructure
-- **📊 State Management**: Automatic state sharing between phases  
-- **🔐 Secure**: Uses GitHub secrets for AWS credentials
-- **📝 Detailed Logs**: Full visibility into deployment process
 
 ---
 
@@ -239,7 +180,7 @@ kubectl get namespaces
 ```hcl
 # infrastructure.tfvars
 cluster_name = "saasinfralab-prod"
-cluster_version = "1.31"
+cluster_version = "1.32"
 vpc_cidr = "10.0.0.0/16"
 
 node_group_config = {
@@ -292,12 +233,9 @@ tenants = [
 
 ## 📚 Documentation
 
-- **[Getting Started](docs/getting-started.md)**: Step-by-step setup guide
-- **[Architecture](docs/architecture.md)**: Detailed system design
 - **[Infrastructure Phase](infrastructure/README.md)**: Phase 1 documentation  
 - **[Tenants Phase](tenants/README.md)**: Phase 2 documentation
 - **[Examples](examples/dev-environment/README.md)**: Working examples
-- **[Troubleshooting](docs/troubleshooting.md)**: Common issues and solutions
 
 ---
 
@@ -309,13 +247,27 @@ tenants = [
 4. Push branch (`git push origin feature/amazing-feature`)
 5. Open Pull Request
 
+---
+
+## 📄 License
+
+This project is licensed under the MIT License - see the [LICENSE](LICENSE) file for details.
+
+---
+
+## 🆘 Support
+
+- **Issues**: [GitHub Issues](https://github.com/SaaSInfraLab/Terraform-modules/issues)
+- **Discussions**: [GitHub Discussions](https://github.com/SaaSInfraLab/Terraform-modules/discussions)
+
+---
 
 <div align="center">
 
 **🌟 Star this repository if it helped you build better SaaS infrastructure! 🌟**
 
-[![GitHub stars](https://img.shields.io/github/stars/SaaSInfraLab/cloudnative-saas-eks?style=social)](../../stargazers)
-[![GitHub forks](https://img.shields.io/github/forks/SaaSInfraLab/cloudnative-saas-eks?style=social)](../../network/members)
+[![GitHub stars](https://img.shields.io/github/stars/SaaSInfraLab/Terraform-modules?style=social)](https://github.com/SaaSInfraLab/Terraform-modules/stargazers)
+[![GitHub forks](https://img.shields.io/github/forks/SaaSInfraLab/Terraform-modules?style=social)](https://github.com/SaaSInfraLab/Terraform-modules/network/members)
 
 Built with ❤️ for the SaaS community
 
