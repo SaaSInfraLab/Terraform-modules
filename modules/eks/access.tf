@@ -17,18 +17,21 @@ locals {
   # Explicitly reference the access config variable (ensures linter can resolve it)
   access_config_map = var.cluster_access_config
 
-  # Create a map of explicitly provided principals (known at plan time)
-  explicit_principals_map = {
-    for principal in var.cluster_access_principals :
-    principal => principal
-  }
-
   # Create a map for executor if auto-include is enabled
   # Use a static key (known at plan time) to avoid for_each issues
   # The ARN value will be resolved at apply time
   executor_map = var.auto_include_executor ? {
     "terraform-executor" = data.aws_caller_identity.executor.arn
   } : {}
+
+  # Create a map of explicitly provided principals (known at plan time)
+  # Filter out the executor ARN if auto-include is enabled to avoid duplicates
+  # Note: Comparison happens at apply time, but Terraform handles this correctly
+  explicit_principals_map = {
+    for principal in var.cluster_access_principals :
+    principal => principal
+    if !var.auto_include_executor || principal != data.aws_caller_identity.executor.arn
+  }
 
   # Combine all access principals as a map (for_each requires map with known keys)
   # Explicit principals are known, executor ARN will be resolved at apply
@@ -40,6 +43,7 @@ locals {
   # Create a map of principal ARN -> access configuration
   # Defaults to cluster admin if not specified
   # Handle explicitly provided principals (known at plan time)
+  # Filter out executor ARN if auto-include is enabled to avoid duplicates
   explicit_access_config = {
     for principal in var.cluster_access_principals :
     principal => lookup(local.access_config_map, principal, {
@@ -49,6 +53,7 @@ locals {
         namespaces = []
       }
     })
+    if !var.auto_include_executor || principal != data.aws_caller_identity.executor.arn
   }
 
   # Handle executor access config
@@ -88,6 +93,11 @@ resource "aws_eks_access_entry" "cluster_access" {
       ManagedBy = "Terraform"
     }
   )
+
+  # Prevent errors if access entry already exists (e.g., from previous runs or manual creation)
+  lifecycle {
+    create_before_destroy = true
+  }
 
   depends_on = [aws_eks_cluster.main]
 }
