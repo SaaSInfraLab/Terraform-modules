@@ -29,7 +29,7 @@ This platform provides a complete multi-tenant SaaS infrastructure solution buil
 ## 📁 Project Structure
 
 ```
-cloudnative-saas-eks/
+Terraform-modules/
 ├── 📚 modules/                     # Reusable Terraform modules
 │   ├── vpc/                        # Network foundation
 │   ├── iam/                        # Identity & access management  
@@ -63,12 +63,11 @@ cloudnative-saas-eks/
 │       └── README.md               # Deployment guide
 │
 ├── 🚀 .github/workflows/           # CI/CD automation
-│   └── terraform.yml               # GitHub Actions workflow
+│   └── CI-CD.yml               # GitHub Actions workflow
 │
-└── 📖 docs/                        # Documentation
-    ├── architecture.md             # Detailed architecture
-    ├── getting-started.md          # Quick start guide
-    └── troubleshooting.md          # Common issues
+└── 📖 docs/                             # Documentation
+    ├── github-actions-oidc-complete.md  # Quick setup for OIDC
+    └── github-actions-setup.md          # Quick start guide for github actions
 ```
 
 ---
@@ -310,21 +309,6 @@ tenants = [
 4. Push branch (`git push origin feature/amazing-feature`)
 5. Open Pull Request
 
----
-
-## 📄 License
-
-This project is licensed under the MIT License - see the [LICENSE](LICENSE) file for details.
-
----
-
-## 🆘 Support
-
-- **Issues**: [GitHub Issues](../../issues)
-- **Discussions**: [GitHub Discussions](../../discussions)
-- **Documentation**: [docs/](docs/)
-
----
 
 <div align="center">
 
