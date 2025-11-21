@@ -14,6 +14,9 @@ data "aws_caller_identity" "executor" {}
 
 # Merge provided access principals with auto-detected executor
 locals {
+  # Explicitly reference the access config variable (ensures linter can resolve it)
+  access_config_map = var.cluster_access_config
+
   # Create a map of explicitly provided principals (known at plan time)
   explicit_principals_map = {
     for principal in var.cluster_access_principals :
@@ -21,9 +24,10 @@ locals {
   }
 
   # Create a map for executor if auto-include is enabled
-  # Use a placeholder key that we'll replace with the actual ARN
+  # Use a static key (known at plan time) to avoid for_each issues
+  # The ARN value will be resolved at apply time
   executor_map = var.auto_include_executor ? {
-    (data.aws_caller_identity.executor.arn) = data.aws_caller_identity.executor.arn
+    "terraform-executor" = data.aws_caller_identity.executor.arn
   } : {}
 
   # Combine all access principals as a map (for_each requires map with known keys)
@@ -38,7 +42,7 @@ locals {
   # Handle explicitly provided principals (known at plan time)
   explicit_access_config = {
     for principal in var.cluster_access_principals :
-    principal => lookup(var.cluster_access_config, principal, {
+    principal => lookup(local.access_config_map, principal, {
       policy_arn = "arn:aws:eks::aws:cluster-access-policy/AmazonEKSClusterAdminPolicy"
       access_scope = {
         type       = "cluster"
@@ -47,10 +51,11 @@ locals {
     })
   }
 
-  # Handle executor access config (unknown at plan time)
+  # Handle executor access config
+  # Use static key to match executor_map structure
   executor_access_config = var.auto_include_executor ? {
-    (data.aws_caller_identity.executor.arn) = lookup(
-      var.cluster_access_config,
+    "terraform-executor" = lookup(
+      local.access_config_map,
       data.aws_caller_identity.executor.arn,
       {
         policy_arn = "arn:aws:eks::aws:cluster-access-policy/AmazonEKSClusterAdminPolicy"
@@ -93,7 +98,8 @@ resource "aws_eks_access_policy_association" "cluster_access_policy" {
   for_each = local.access_config
 
   cluster_name  = aws_eks_cluster.main.name
-  principal_arn = each.key
+  # For executor, use the ARN from executor_map; for others, use the key directly
+  principal_arn = each.key == "terraform-executor" ? local.executor_map["terraform-executor"] : each.key
   policy_arn    = each.value.policy_arn
 
   access_scope {
