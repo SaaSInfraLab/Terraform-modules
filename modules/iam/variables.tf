@@ -39,3 +39,33 @@ variable "create_cloudwatch_agent_role" {
   type        = bool
   default     = true
 }
+
+variable "create_eks_access_roles" {
+  description = "Whether to create IAM roles for EKS cluster access (Admin, Developer, Viewer)"
+  type        = bool
+  default     = true
+}
+
+variable "eks_admin_trusted_principals" {
+  description = "List of IAM principal ARNs that can assume the EKS Admin role"
+  type        = list(string)
+  default     = []
+}
+
+variable "eks_developer_trusted_principals" {
+  description = "List of IAM principal ARNs that can assume the EKS Developer role"
+  type        = list(string)
+  default     = []
+}
+
+variable "eks_viewer_trusted_principals" {
+  description = "List of IAM principal ARNs that can assume the EKS Viewer role"
+  type        = list(string)
+  default     = []
+}
+
+variable "aws_region" {
+  description = "AWS region (used for assume role condition)"
+  type        = string
+  default     = ""
+}

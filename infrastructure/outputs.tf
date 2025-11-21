@@ -7,6 +7,21 @@ output "cluster_name" {
   value       = module.eks.cluster_name
 }
 
+output "eks_admin_role_arn" {
+  description = "ARN of the EKS Admin IAM role"
+  value       = module.iam.eks_admin_role_arn
+}
+
+output "eks_developer_role_arn" {
+  description = "ARN of the EKS Developer IAM role"
+  value       = module.iam.eks_developer_role_arn
+}
+
+output "eks_viewer_role_arn" {
+  description = "ARN of the EKS Viewer IAM role"
+  value       = module.iam.eks_viewer_role_arn
+}
+
 output "cluster_arn" {
   description = "ARN of the EKS cluster"
   value       = module.eks.cluster_arn

@@ -37,3 +37,33 @@ output "cloudwatch_agent_role_name" {
   description = "Name of the CloudWatch Agent IAM role"
   value       = try(aws_iam_role.cloudwatch_agent[0].name, null)
 }
+
+output "eks_admin_role_arn" {
+  description = "ARN of the EKS Admin IAM role"
+  value       = try(aws_iam_role.eks_admin[0].arn, null)
+}
+
+output "eks_admin_role_name" {
+  description = "Name of the EKS Admin IAM role"
+  value       = try(aws_iam_role.eks_admin[0].name, null)
+}
+
+output "eks_developer_role_arn" {
+  description = "ARN of the EKS Developer IAM role"
+  value       = try(aws_iam_role.eks_developer[0].arn, null)
+}
+
+output "eks_developer_role_name" {
+  description = "Name of the EKS Developer IAM role"
+  value       = try(aws_iam_role.eks_developer[0].name, null)
+}
+
+output "eks_viewer_role_arn" {
+  description = "ARN of the EKS Viewer IAM role"
+  value       = try(aws_iam_role.eks_viewer[0].arn, null)
+}
+
+output "eks_viewer_role_name" {
+  description = "Name of the EKS Viewer IAM role"
+  value       = try(aws_iam_role.eks_viewer[0].name, null)
+}

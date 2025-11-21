@@ -138,3 +138,79 @@ resource "aws_iam_role_policy_attachment" "cw_agent_CloudWatchAgentServerPolicy"
     role       = aws_iam_role.cloudwatch_agent[0].name
     policy_arn = "arn:aws:iam::aws:policy/CloudWatchAgentServerPolicy"
 }
+
+####################
+# EKS: Cluster Access Roles (for users/CI/CD to access the cluster)
+####################
+
+# Admin Role - Full cluster admin access
+resource "aws_iam_role" "eks_admin" {
+    count = var.create_eks_access_roles && length(var.eks_admin_trusted_principals) > 0 ? 1 : 0
+    name = "${local.prefix}-eks-admin-role"
+
+    assume_role_policy = jsonencode({
+        Version = "2012-10-17"
+        Statement = [
+            {
+                Effect = "Allow"
+                Principal = {
+                    AWS = var.eks_admin_trusted_principals
+                }
+                Action = "sts:AssumeRole"
+            }
+        ]
+    })
+
+    tags = merge(var.tags, {
+        Name = "${local.prefix}-eks-admin-role"
+        Purpose = "EKS Cluster Admin Access"
+    })
+}
+
+# Developer Role - Edit access (can create/update but not delete critical resources)
+resource "aws_iam_role" "eks_developer" {
+    count = var.create_eks_access_roles && length(var.eks_developer_trusted_principals) > 0 ? 1 : 0
+    name = "${local.prefix}-eks-developer-role"
+
+    assume_role_policy = jsonencode({
+        Version = "2012-10-17"
+        Statement = [
+            {
+                Effect = "Allow"
+                Principal = {
+                    AWS = var.eks_developer_trusted_principals
+                }
+                Action = "sts:AssumeRole"
+            }
+        ]
+    })
+
+    tags = merge(var.tags, {
+        Name = "${local.prefix}-eks-developer-role"
+        Purpose = "EKS Cluster Developer Access"
+    })
+}
+
+# Viewer Role - Read-only access
+resource "aws_iam_role" "eks_viewer" {
+    count = var.create_eks_access_roles && length(var.eks_viewer_trusted_principals) > 0 ? 1 : 0
+    name = "${local.prefix}-eks-viewer-role"
+
+    assume_role_policy = jsonencode({
+        Version = "2012-10-17"
+        Statement = [
+            {
+                Effect = "Allow"
+                Principal = {
+                    AWS = var.eks_viewer_trusted_principals
+                }
+                Action = "sts:AssumeRole"
+            }
+        ]
+    })
+
+    tags = merge(var.tags, {
+        Name = "${local.prefix}-eks-viewer-role"
+        Purpose = "EKS Cluster Viewer Access"
+    })
+}

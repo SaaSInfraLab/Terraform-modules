@@ -30,9 +30,15 @@ module "iam" {
   create_eks_node_role         = true
   create_vpc_flow_logs_role    = true
   create_cloudwatch_agent_role = true
+  create_eks_access_roles      = var.create_eks_access_roles
   
   name_prefix  = var.cluster_name
   cluster_name = var.cluster_name
+  aws_region   = var.aws_region
+  
+  eks_admin_trusted_principals      = var.eks_admin_trusted_principals
+  eks_developer_trusted_principals  = var.eks_developer_trusted_principals
+  eks_viewer_trusted_principals     = var.eks_viewer_trusted_principals
   
   tags = local.common_tags
 }
@@ -86,6 +92,11 @@ module "eks" {
   node_group_max_size     = var.node_group_config.scaling_config.max_size
   node_group_min_size     = var.node_group_config.scaling_config.min_size
   node_instance_types     = var.node_group_config.instance_types
+  
+  # Cluster access configuration
+  cluster_access_principals = var.cluster_access_principals
+  cluster_access_config     = var.cluster_access_config
+  auto_include_executor     = var.auto_include_executor
   
   tags = local.common_tags
   

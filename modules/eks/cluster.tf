@@ -54,3 +54,5 @@ resource "aws_iam_openid_connect_provider" "cluster" {
     { Name = "${var.cluster_name}-irsa" }
   )
 }
+
+# Access management moved to access.tf for better organization

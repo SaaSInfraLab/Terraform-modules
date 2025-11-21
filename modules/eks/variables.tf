@@ -138,3 +138,48 @@ variable "tags" {
   default     = {}
 }
 
+variable "cluster_access_principals" {
+  description = "List of IAM principal ARNs (users or roles) that should have cluster access. Prefer IAM roles over users for better security."
+  type        = list(string)
+  default     = []
+}
+
+variable "auto_include_executor" {
+  description = "Automatically include the IAM principal running Terraform (current caller) in cluster access. Useful for initial setup."
+  type        = bool
+  default     = true
+}
+
+variable "cluster_access_config" {
+  description = <<-EOT
+    Map of principal ARN to access configuration. Allows different access levels per principal.
+    If not specified for a principal, defaults to cluster admin.
+    
+    Example:
+    cluster_access_config = {
+      "arn:aws:iam::123456789012:role/AdminRole" = {
+        policy_arn = "arn:aws:eks::aws:cluster-access-policy/AmazonEKSClusterAdminPolicy"
+        access_scope = {
+          type       = "cluster"
+          namespaces = []
+        }
+      }
+      "arn:aws:iam::123456789012:role/ViewerRole" = {
+        policy_arn = "arn:aws:eks::aws:cluster-access-policy/AmazonEKSViewPolicy"
+        access_scope = {
+          type       = "cluster"
+          namespaces = []
+        }
+      }
+    }
+  EOT
+  type = map(object({
+    policy_arn = string
+    access_scope = object({
+      type       = string
+      namespaces = list(string)
+    })
+  }))
+  default = {}
+}
+

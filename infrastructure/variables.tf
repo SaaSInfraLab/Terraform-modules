@@ -27,7 +27,7 @@ variable "cluster_name" {
 variable "cluster_version" {
   description = "Kubernetes version for EKS cluster"
   type        = string
-  default     = "1.31"
+  default     = "1.32"
 }
 
 variable "cluster_endpoint_config" {
@@ -122,8 +122,64 @@ variable "enable_encryption" {
   default     = true
 }
 
-variable "cluster_admin_arns" {
-  description = "List of IAM user/role ARNs that should have admin access to the EKS cluster"
+variable "cluster_access_principals" {
+  description = "List of IAM principal ARNs (users or roles) that should have cluster access. Prefer IAM roles over users."
+  type        = list(string)
+  default     = []
+}
+
+variable "cluster_access_config" {
+  description = <<-EOT
+    Map of principal ARN to access configuration. Allows different access levels per principal.
+    If not specified for a principal, defaults to cluster admin.
+    
+    Example:
+    cluster_access_config = {
+      "arn:aws:iam::123456789012:role/AdminRole" = {
+        policy_arn = "arn:aws:eks::aws:cluster-access-policy/AmazonEKSClusterAdminPolicy"
+        access_scope = {
+          type       = "cluster"
+          namespaces = []
+        }
+      }
+    }
+  EOT
+  type = map(object({
+    policy_arn = string
+    access_scope = object({
+      type       = string
+      namespaces = list(string)
+    })
+  }))
+  default = {}
+}
+
+variable "auto_include_executor" {
+  description = "Automatically include the IAM principal running Terraform in cluster access"
+  type        = bool
+  default     = true
+}
+
+variable "create_eks_access_roles" {
+  description = "Whether to create IAM roles for EKS cluster access (Admin, Developer, Viewer)"
+  type        = bool
+  default     = true
+}
+
+variable "eks_admin_trusted_principals" {
+  description = "List of IAM principal ARNs that can assume the EKS Admin role"
+  type        = list(string)
+  default     = []
+}
+
+variable "eks_developer_trusted_principals" {
+  description = "List of IAM principal ARNs that can assume the EKS Developer role"
+  type        = list(string)
+  default     = []
+}
+
+variable "eks_viewer_trusted_principals" {
+  description = "List of IAM principal ARNs that can assume the EKS Viewer role"
   type        = list(string)
   default     = []
 }

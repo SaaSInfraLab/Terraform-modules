@@ -1,13 +1,47 @@
-.terraform
+# Terraform directories and files
+.terraform/
 .terraform.lock.hcl
 .terraformrc
-# Ignore Terraform state files and backups
+.terraform.tfstate.d/
+
+# Terraform state files and backups
 *.tfstate
 *.tfstate.backup
+*.tfstate.*
 
-# Ignore local tfvars (may contain secrets)
+# Local tfvars files (may contain secrets)
 *.tfvars
+!*.tfvars.example
 
-# Ignore provider and credential overrides
-.terraform.tfstate.d
-.terraform.lock.hcl
+# Crash log files
+crash.log
+crash.*.log
+
+# Exclude all .tfvars files that are not examples
+*.auto.tfvars
+*.auto.tfvars.json
+
+# Ignore override files
+override.tf
+override.tf.json
+*_override.tf
+*_override.tf.json
+
+# Ignore CLI configuration files
+.terraformrc
+terraform.rc
+
+# OS files
+.DS_Store
+Thumbs.db
+*.swp
+*.swo
+*~
+
+# IDE files
+.vscode/
+.idea/
+*.iml
+
+# Logs
+*.log
