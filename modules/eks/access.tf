@@ -14,41 +14,73 @@ data "aws_caller_identity" "executor" {}
 
 # Merge provided access principals with auto-detected executor
 locals {
-  # Auto-include the current caller (Terraform executor) if enabled
-  auto_include_executor = var.auto_include_executor ? [data.aws_caller_identity.executor.arn] : []
-  
-  # Combine all access principals (deduplicated)
-  all_access_principals = distinct(concat(
-    local.auto_include_executor,
-    var.cluster_access_principals
-  ))
-  
+  # Create a map of explicitly provided principals (known at plan time)
+  explicit_principals_map = {
+    for principal in var.cluster_access_principals :
+    principal => principal
+  }
+
+  # Create a map for executor if auto-include is enabled
+  # Use a placeholder key that we'll replace with the actual ARN
+  executor_map = var.auto_include_executor ? {
+    (data.aws_caller_identity.executor.arn) = data.aws_caller_identity.executor.arn
+  } : {}
+
+  # Combine all access principals as a map (for_each requires map with known keys)
+  # Explicit principals are known, executor ARN will be resolved at apply
+  all_access_principals_map = merge(
+    local.explicit_principals_map,
+    local.executor_map
+  )
+
   # Create a map of principal ARN -> access configuration
   # Defaults to cluster admin if not specified
-  access_config = {
-    for principal in local.all_access_principals :
+  # Handle explicitly provided principals (known at plan time)
+  explicit_access_config = {
+    for principal in var.cluster_access_principals :
     principal => lookup(var.cluster_access_config, principal, {
       policy_arn = "arn:aws:eks::aws:cluster-access-policy/AmazonEKSClusterAdminPolicy"
       access_scope = {
-        type        = "cluster"
-        namespaces  = []
+        type       = "cluster"
+        namespaces = []
       }
     })
   }
+
+  # Handle executor access config (unknown at plan time)
+  executor_access_config = var.auto_include_executor ? {
+    (data.aws_caller_identity.executor.arn) = lookup(
+      var.cluster_access_config,
+      data.aws_caller_identity.executor.arn,
+      {
+        policy_arn = "arn:aws:eks::aws:cluster-access-policy/AmazonEKSClusterAdminPolicy"
+        access_scope = {
+          type       = "cluster"
+          namespaces = []
+        }
+      }
+    )
+  } : {}
+
+  # Merge both configs
+  access_config = merge(
+    local.explicit_access_config,
+    local.executor_access_config
+  )
 }
 
 # EKS Access Entries for IAM principals (users/roles) to access the cluster
 resource "aws_eks_access_entry" "cluster_access" {
-  for_each     = toset(local.all_access_principals)
-  cluster_name = aws_eks_cluster.main.name
+  for_each      = local.all_access_principals_map
+  cluster_name  = aws_eks_cluster.main.name
   principal_arn = each.value
 
   tags = merge(
     var.tags,
     {
-      Name        = "${var.cluster_name}-access-${replace(replace(each.value, "/", "-"), ":", "-")}"
-      Principal    = each.value
-      ManagedBy    = "Terraform"
+      Name      = "${var.cluster_name}-access-${replace(replace(each.value, "/", "-"), ":", "-")}"
+      Principal = each.value
+      ManagedBy = "Terraform"
     }
   )
 
@@ -65,8 +97,8 @@ resource "aws_eks_access_policy_association" "cluster_access_policy" {
   policy_arn    = each.value.policy_arn
 
   access_scope {
-    type        = each.value.access_scope.type
-    namespaces  = each.value.access_scope.namespaces
+    type       = each.value.access_scope.type
+    namespaces = each.value.access_scope.namespaces
   }
 
   depends_on = [aws_eks_access_entry.cluster_access]
