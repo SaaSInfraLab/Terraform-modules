@@ -36,6 +36,9 @@ terraform output cluster_name
 - kubectl installed
 - Terraform >= 1.0
 
+### Cluster Endpoint Resilience
+**Note:** This module automatically fetches the current cluster endpoint directly from AWS, ensuring it always uses the latest endpoint even if the remote state file has stale data. This prevents connection errors when the cluster endpoint changes (e.g., after cluster updates or recreations).
+
 ## Quick Start
 
 ### Deploy Multi-Tenancy

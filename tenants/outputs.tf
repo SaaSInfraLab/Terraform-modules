@@ -36,8 +36,8 @@ output "cluster_name" {
 }
 
 output "cluster_endpoint" {
-  description = "Endpoint URL of the EKS cluster"
-  value       = data.terraform_remote_state.infrastructure.outputs.cluster_endpoint
+  description = "Endpoint URL of the EKS cluster (fetched directly from AWS, always current)"
+  value       = data.aws_eks_cluster.current.endpoint
 }
 
 # =============================================================================
