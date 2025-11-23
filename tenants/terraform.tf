@@ -64,10 +64,7 @@ locals {
   # Find the actual cluster name
   # If remote state cluster exists in AWS, use it; otherwise use the first cluster found
   # This handles cases where remote state has stale/incorrect cluster name
-  actual_cluster_name = try(
-    # Try to use remote state name if it exists in the list of actual clusters
-    contains(local.all_cluster_names, local.remote_state_cluster_name) ? local.remote_state_cluster_name : null,
-    # Fallback: use first cluster if remote state name doesn't exist
+  actual_cluster_name = length(local.all_cluster_names) > 0 && contains(local.all_cluster_names, local.remote_state_cluster_name) ? local.remote_state_cluster_name : (
     length(local.all_cluster_names) > 0 ? local.all_cluster_names[0] : local.remote_state_cluster_name
   )
 }
@@ -76,7 +73,7 @@ locals {
 # This ensures we always get the current endpoint, even if remote state is stale
 # Uses fallback logic to handle stale cluster names in remote state
 data "aws_eks_cluster" "current" {
-  name = local.actual_cluster_name != "" ? local.actual_cluster_name : (length(local.all_cluster_names) > 0 ? local.all_cluster_names[0] : local.remote_state_cluster_name)
+  name = local.actual_cluster_name
 }
 
 provider "kubernetes" {
