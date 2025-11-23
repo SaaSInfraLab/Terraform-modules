@@ -50,11 +50,30 @@ data "terraform_remote_state" "infrastructure" {
   }
 }
 
+# List all EKS clusters to find the correct one
+# This provides resilience if remote state has stale cluster name
+data "aws_eks_clusters" "all" {}
+
+locals {
+  # Get cluster name from remote state (may be stale)
+  remote_state_cluster_name = try(data.terraform_remote_state.infrastructure.outputs.cluster_name, "")
+  
+  # Find the actual cluster name
+  # If remote state cluster exists in AWS, use it; otherwise use the first cluster found
+  # This handles cases where remote state has stale/incorrect cluster name
+  actual_cluster_name = try(
+    # Try to use remote state name if it exists in the list of actual clusters
+    contains(data.aws_eks_clusters.all.names, local.remote_state_cluster_name) ? local.remote_state_cluster_name : null,
+    # Fallback: use first cluster if remote state name doesn't exist
+    length(data.aws_eks_clusters.all.names) > 0 ? data.aws_eks_clusters.all.names[0] : local.remote_state_cluster_name
+  )
+}
+
 # Get current cluster info directly from AWS (always up-to-date)
 # This ensures we always get the current endpoint, even if remote state is stale
-# This is the long-term solution to prevent stale endpoint errors
+# Uses fallback logic to handle stale cluster names in remote state
 data "aws_eks_cluster" "current" {
-  name = data.terraform_remote_state.infrastructure.outputs.cluster_name
+  name = local.actual_cluster_name != "" ? local.actual_cluster_name : data.aws_eks_clusters.all.names[0]
 }
 
 provider "kubernetes" {
