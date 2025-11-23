@@ -274,13 +274,13 @@ After successful deployment, this phase provides:
 ## Files in this Directory
 
 - **main.tf**: Multi-tenancy module configuration
-- **providers.tf**: AWS and Kubernetes provider setup
+- **terraform.tf**: AWS and Kubernetes provider setup
 - **variables.tf**: Input variable definitions
 - **outputs.tf**: Output values and commands
-- **versions.tf**: Terraform and provider requirements
-- **backend.tf**: State backend configuration
 - **tenants.tfvars.example**: Example tenant configurations
 - **README.md**: This documentation
+
+**Note**: This module is designed to be used as a child module. Backend configuration should be defined in the root module that calls this module, not in this module itself.
 
 ## Next Steps
 
