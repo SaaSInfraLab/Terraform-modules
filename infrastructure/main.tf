@@ -137,3 +137,63 @@ module "security" {
   
   depends_on = [module.eks]
 }
+
+# =============================================================================
+# ECR REPOSITORIES
+# =============================================================================
+
+module "ecr_backend" {
+  source = "../modules/ecr"
+  
+  repository_name     = "${var.cluster_name}-backend"
+  image_tag_mutability = var.ecr_image_tag_mutability
+  scan_on_push        = var.ecr_scan_on_push
+  encryption_type     = var.ecr_encryption_type
+  
+  lifecycle_policy = jsonencode({
+    rules = [
+      {
+        rulePriority = 1
+        description  = "Keep last ${var.ecr_image_retention_count} images"
+        selection = {
+          tagStatus     = "any"
+          countType     = "imageCountMoreThan"
+          countNumber   = var.ecr_image_retention_count
+        }
+        action = {
+          type = "expire"
+        }
+      }
+    ]
+  })
+  
+  tags = local.common_tags
+}
+
+module "ecr_frontend" {
+  source = "../modules/ecr"
+  
+  repository_name     = "${var.cluster_name}-frontend"
+  image_tag_mutability = var.ecr_image_tag_mutability
+  scan_on_push        = var.ecr_scan_on_push
+  encryption_type     = var.ecr_encryption_type
+  
+  lifecycle_policy = jsonencode({
+    rules = [
+      {
+        rulePriority = 1
+        description  = "Keep last ${var.ecr_image_retention_count} images"
+        selection = {
+          tagStatus     = "any"
+          countType     = "imageCountMoreThan"
+          countNumber   = var.ecr_image_retention_count
+        }
+        action = {
+          type = "expire"
+        }
+      }
+    ]
+  })
+  
+  tags = local.common_tags
+}

@@ -183,3 +183,31 @@ variable "eks_viewer_trusted_principals" {
   type        = list(string)
   default     = []
 }
+
+# =============================================================================
+# ECR CONFIGURATION
+# =============================================================================
+
+variable "ecr_image_tag_mutability" {
+  description = "The tag mutability setting for ECR repositories. Must be one of: MUTABLE or IMMUTABLE"
+  type        = string
+  default     = "MUTABLE"
+}
+
+variable "ecr_scan_on_push" {
+  description = "Indicates whether images are scanned after being pushed to ECR repositories"
+  type        = bool
+  default     = true
+}
+
+variable "ecr_encryption_type" {
+  description = "The encryption type to use for ECR repositories. Valid values are AES256 or KMS"
+  type        = string
+  default     = "AES256"
+}
+
+variable "ecr_image_retention_count" {
+  description = "Number of images to retain in ECR repositories (older images will be automatically deleted)"
+  type        = number
+  default     = 10
+}

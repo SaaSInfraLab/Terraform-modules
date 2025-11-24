@@ -106,3 +106,32 @@ output "kubeconfig_update_command" {
   description = "Command to update kubeconfig for this cluster"
   value       = "aws eks update-kubeconfig --region ${var.aws_region} --name ${module.eks.cluster_name}"
 }
+
+# =============================================================================
+# ECR REPOSITORY INFORMATION
+# =============================================================================
+
+output "ecr_backend_repository_url" {
+  description = "URL of the backend ECR repository"
+  value       = module.ecr_backend.repository_url
+}
+
+output "ecr_frontend_repository_url" {
+  description = "URL of the frontend ECR repository"
+  value       = module.ecr_frontend.repository_url
+}
+
+output "ecr_backend_repository_name" {
+  description = "Name of the backend ECR repository"
+  value       = module.ecr_backend.repository_name
+}
+
+output "ecr_frontend_repository_name" {
+  description = "Name of the frontend ECR repository"
+  value       = module.ecr_frontend.repository_name
+}
+
+output "ecr_registry_id" {
+  description = "The registry ID where ECR repositories were created"
+  value       = module.ecr_backend.registry_id
+}
