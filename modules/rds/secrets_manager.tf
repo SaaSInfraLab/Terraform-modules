@@ -13,14 +13,14 @@ resource "aws_secretsmanager_secret_version" "rds_credentials" {
     username             = var.username
     password             = var.create_random_password ? random_password.master_password[0].result : var.password
     engine               = var.engine
-    host                 = aws_db_instance.this.address
+    host                 = aws_db_instance.main.address
     port                 = var.db_port
     dbname              = var.db_name
-    db_instance_identifier = aws_db_instance.this.id
+    db_instance_identifier = aws_db_instance.main.id
   })
 
   depends_on = [
-    aws_db_instance.this,
+    aws_db_instance.main,
     random_password.master_password
   ]
 }
