@@ -45,7 +45,7 @@ data "terraform_remote_state" "infrastructure" {
   
   config = {
     bucket = "saas-infra-lab-terraform-state"
-    key    = "saas-infra-lab/infrastructure/terraform.tfstate"
+    key    = "saas-infra-lab/${var.environment}/infrastructure/terraform.tfstate"
     region = "us-east-1"
   }
 }
