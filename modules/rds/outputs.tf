@@ -13,6 +13,11 @@ output "db_instance_endpoint" {
   value       = aws_db_instance.main.endpoint
 }
 
+output "db_instance_address" {
+  description = "The address (hostname only) for the RDS instance"
+  value       = aws_db_instance.main.address
+}
+
 output "db_instance_port" {
   description = "The port the database is listening on"
   value       = aws_db_instance.main.port
