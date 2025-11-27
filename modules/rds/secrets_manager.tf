@@ -28,15 +28,3 @@ resource "aws_secretsmanager_secret_version" "rds_credentials" {
 resource "random_id" "secret_id" {
   byte_length = 8
 }
-
-# Output the secret ARN for other modules to use
-output "rds_secret_arn" {
-  description = "The ARN of the secret in AWS Secrets Manager"
-  value       = aws_secretsmanager_secret.rds_credentials.arn
-}
-
-# Output the secret name for reference
-output "rds_secret_name" {
-  description = "The name of the secret in AWS Secrets Manager"
-  value       = aws_secretsmanager_secret.rds_credentials.name
-}
