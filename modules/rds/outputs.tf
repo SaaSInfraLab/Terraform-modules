@@ -59,3 +59,13 @@ output "ssm_parameter_arn" {
   description = "The ARN of the SSM parameter storing the database password (if store_password_in_ssm is true)"
   value       = var.store_password_in_ssm ? aws_ssm_parameter.db_password[0].arn : null
 }
+
+output "rds_secret_arn" {
+  description = "The ARN of the secret in AWS Secrets Manager"
+  value       = aws_secretsmanager_secret.rds_credentials.arn
+}
+
+output "rds_secret_name" {
+  description = "The name of the secret in AWS Secrets Manager"
+  value       = aws_secretsmanager_secret.rds_credentials.name
+}
