@@ -17,7 +17,7 @@ resource "kubernetes_namespace" "tenant" {
       local.k8s_safe_tags,
       {
         tenant      = each.value.name
-        environment = "production"
+        environment = var.environment
       }
     )
   }

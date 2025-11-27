@@ -41,6 +41,12 @@ variable "enable_service_accounts" {
   default     = true
 }
 
+variable "environment" {
+  description = "Deployment environment (e.g., dev, staging, prod)"
+  type        = string
+  default     = "production"
+}
+
 variable "tags" {
   description = "Tags to apply to all resources"
   type        = map(string)
