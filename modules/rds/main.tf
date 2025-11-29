@@ -87,9 +87,10 @@ resource "aws_db_instance" "main" {
   monitoring_interval                   = var.monitoring_interval
   monitoring_role_arn                   = var.monitoring_role_arn
   
-  multi_az               = var.multi_az
-  apply_immediately      = var.apply_immediately
-  deletion_protection    = var.deletion_protection
+  multi_az                    = var.multi_az
+  apply_immediately           = var.apply_immediately
+  deletion_protection         = var.deletion_protection
+  auto_minor_version_upgrade  = var.auto_minor_version_upgrade
   
   parameter_group_name = var.parameter_group_name != null ? var.parameter_group_name : (
     var.engine == "postgres" ? aws_db_parameter_group.default[0].name : null

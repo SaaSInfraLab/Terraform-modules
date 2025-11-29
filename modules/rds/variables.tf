@@ -181,6 +181,12 @@ variable "deletion_protection" {
   default     = false
 }
 
+variable "auto_minor_version_upgrade" {
+  description = "Indicates that minor engine upgrades will be applied automatically to the DB instance during the maintenance window"
+  type        = bool
+  default     = false
+}
+
 variable "parameter_group_name" {
   description = "Name of the DB parameter group to associate"
   type        = string
