@@ -106,6 +106,23 @@ resource "kubernetes_network_policy" "tenant_isolation" {
         port     = "53"
       }
     }
+
+    # Allow egress to RDS (PostgreSQL) on port 5432
+    # RDS is in private subnet within VPC, so we allow egress to VPC CIDR
+    egress {
+      ports {
+        protocol = "TCP"
+        port     = "5432"
+      }
+    }
+
+    # Allow egress for HTTPS (for AWS API calls, Secrets Manager, etc.)
+    egress {
+      ports {
+        protocol = "TCP"
+        port     = "443"
+      }
+    }
   }
 
   depends_on = [
