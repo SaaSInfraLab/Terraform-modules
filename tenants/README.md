@@ -16,9 +16,14 @@ This directory contains the Terraform configuration for deploying multi-tenant K
 - **Service Accounts**: IAM roles for service accounts (IRSA) integration
 
 ### 👥 Default Tenants
-1. **saasinfralab-platform**: Core platform services (20 CPU, 40Gi RAM)
-2. **team-data**: Data processing workloads (10 CPU, 20Gi RAM)
-3. **team-analytics**: Analytics and ML workloads (15 CPU, 30Gi RAM)
+1. **platform**: Core platform services (20 CPU, 40Gi RAM, 200 pods)
+2. **analytics**: Analytics and ML workloads (15 CPU, 30Gi RAM, 180 pods)
+
+### 🔐 Secrets Management
+- **Platform Namespace**: Uses AWS Secrets Manager via CSI driver (dynamic secret injection)
+- **Analytics Namespace**: Uses Terraform-managed Kubernetes secrets
+- **Automatic Sync**: Database credentials are automatically read from AWS Secrets Manager
+- **Consistency**: Ensures RDS and Kubernetes secrets always match
 
 ## Prerequisites
 
@@ -82,17 +87,31 @@ kubectl describe resourcequota -n team-data
 ```hcl
 tenants = [
   {
-    name                  = "team-data"
-    namespace             = "team-data"
-    cpu_limit             = "10"           # 10 CPU cores
-    memory_limit          = "20Gi"         # 20GB RAM
-    pod_limit             = 150            # Maximum pods
-    storage_limit         = "100Gi"        # 100GB storage
+    name                  = "platform"
+    namespace             = "platform"
+    cpu_limit             = "20"           # 20 CPU cores
+    memory_limit          = "40Gi"        # 40GB RAM
+    pod_limit             = 200           # Maximum pods
+    storage_limit         = "200Gi"       # 200GB storage
+    enable_network_policy = true           # Traffic isolation
+  },
+  {
+    name                  = "analytics"
+    namespace             = "analytics"
+    cpu_limit             = "15"           # 15 CPU cores
+    memory_limit          = "30Gi"         # 30GB RAM
+    pod_limit             = 180            # Maximum pods
+    storage_limit         = "150Gi"        # 150GB storage
     enable_network_policy = true           # Traffic isolation
   }
-  # ... more tenants
 ]
+
+# Database credentials (automatically read from AWS Secrets Manager)
+db_user     = "taskuser"
+db_password = "changeme"  # Fallback if Secrets Manager unavailable
 ```
+
+**Important**: The tenants Terraform automatically reads database credentials from AWS Secrets Manager (created during infrastructure deployment). The `db_password` in `tenants.tfvars` is only used as a fallback. This ensures consistency between RDS and Kubernetes secrets.
 
 ### Tenant Resource Allocation
 

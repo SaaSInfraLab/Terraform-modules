@@ -66,8 +66,8 @@ output "public_subnet_ids" {
 # =============================================================================
 
 output "cluster_security_group_id" {
-  description = "Security group ID attached to the EKS cluster"
-  value       = module.vpc.eks_cluster_sg_id
+  description = "Security group ID attached to the EKS cluster (AWS-managed)"
+  value       = module.eks.cluster_security_group_id
 }
 
 output "nodes_security_group_id" {

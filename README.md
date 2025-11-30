@@ -121,10 +121,11 @@ kubectl get namespaces
 ## 💰 Cost Optimization
 
 ### Free Tier Compatible
-- **EC2**: t3.micro instances (750 hours/month free)
+- **EC2**: m7i-flex.large instances (free tier eligible, 1 vCPU, 8GB RAM)
 - **EBS**: 30GB free storage per month
 - **CloudWatch**: 5GB log ingestion free
 - **EKS**: $0.10/hour cluster cost only
+- **RDS**: db.t4g.micro (ARM-based, free tier eligible)
 
 ### Production Optimizations
 - **Spot Instances**: Up to 90% cost savings
@@ -133,8 +134,10 @@ kubectl get namespaces
 - **Log Retention**: Optimize CloudWatch costs
 
 **Estimated Monthly Cost**: 
-- **Development**: ~$75-100 (free tier)
+- **Development**: ~$15-20/month (free tier eligible with m7i-flex.large nodes)
 - **Production**: ~$300-500 (optimized)
+
+**Note**: Development environment uses `m7i-flex.large` nodes (free tier eligible) which provide ~29 pods/node capacity, significantly better than t3.micro (4 pods/node).
 
 ---
 
