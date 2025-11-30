@@ -125,21 +125,21 @@ db_password = "changeme"  # Fallback if Secrets Manager unavailable
 
 ```
 ┌─────────────────────────────────────────────────────────────────┐
-│                    EKS Cluster (from Phase 1)                  │
+│                    EKS Cluster (from Phase 1)                   │
 ├─────────────────────────────────────────────────────────────────┤
 │                                                                 │
-│  ┌─────────────────┐  ┌─────────────────┐  ┌─────────────────┐ │
-│  │ saasinfralab-   │  │   team-data     │  │ team-analytics  │ │
-│  │   platform      │  │   namespace     │  │   namespace     │ │
-│  │   namespace     │  │                 │  │                 │ │
-│  │                 │  │ CPU: 10 cores   │  │ CPU: 15 cores   │ │
-│  │ CPU: 20 cores   │  │ RAM: 20Gi       │  │ RAM: 30Gi       │ │
-│  │ RAM: 40Gi       │  │ Pods: 150       │  │ Pods: 180       │ │
-│  │ Pods: 200       │  │ Storage: 100Gi  │  │ Storage: 150Gi  │ │
-│  │ Storage: 200Gi  │  └─────────────────┘  └─────────────────┘ │
+│  ┌─────────────────┐  ┌─────────────────┐  ┌─────────────────┐  │
+│  │ saasinfralab-   │  │   team-data     │  │ team-analytics  │  │
+│  │   platform      │  │   namespace     │  │   namespace     │  │
+│  │   namespace     │  │                 │  │                 │  │
+│  │                 │  │ CPU: 10 cores   │  │ CPU: 15 cores   │  │
+│  │ CPU: 20 cores   │  │ RAM: 20Gi       │  │ RAM: 30Gi       │  │
+│  │ RAM: 40Gi       │  │ Pods: 150       │  │ Pods: 180       │  │
+│  │ Pods: 200       │  │ Storage: 100Gi  │  │ Storage: 150Gi  │  │
+│  │ Storage: 200Gi  │  └─────────────────┘  └─────────────────┘  │
 │  └─────────────────┘                                            │
 │                                                                 │
-│  Network Policies: ✓    RBAC: ✓    Resource Quotas: ✓         │
+│  Network Policies: ✓    RBAC: ✓    Resource Quotas: ✓          │
 └─────────────────────────────────────────────────────────────────┘
 ```
 
