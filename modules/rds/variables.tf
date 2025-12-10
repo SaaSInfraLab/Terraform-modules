@@ -76,9 +76,9 @@ variable "password" {
 }
 
 variable "create_random_password" {
-  description = "Whether to create random password for RDS primary cluster"
+  description = "Whether to create random password for RDS primary cluster. If false, password must be provided."
   type        = bool
-  default     = true
+  default     = false
 }
 
 variable "db_port" {
