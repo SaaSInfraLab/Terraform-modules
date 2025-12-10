@@ -29,11 +29,7 @@ output "db_instance_username" {
   sensitive   = true
 }
 
-output "db_instance_password" {
-  description = "The database password (this password may be old, because Terraform doesn't track it after initial creation)"
-  value       = aws_db_instance.main.password
-  sensitive   = true
-}
+# Password is managed by AWS Secrets Manager - use the secret ARN to retrieve it
 
 output "db_instance_name" {
   description = "The database name"
@@ -55,22 +51,23 @@ output "security_group_id" {
   value       = aws_security_group.rds.id
 }
 
-output "ssm_parameter_name" {
-  description = "The name of the SSM parameter storing the database password (if store_password_in_ssm is true)"
-  value       = var.store_password_in_ssm ? aws_ssm_parameter.db_password[0].name : null
-}
-
-output "ssm_parameter_arn" {
-  description = "The ARN of the SSM parameter storing the database password (if store_password_in_ssm is true)"
-  value       = var.store_password_in_ssm ? aws_ssm_parameter.db_password[0].arn : null
-}
-
 output "rds_secret_arn" {
-  description = "The ARN of the secret in AWS Secrets Manager"
-  value       = aws_secretsmanager_secret.rds_credentials.arn
+  description = "The ARN of the secret in AWS Secrets Manager (automatically managed by RDS)"
+  value       = try(aws_db_instance.main.master_user_secret[0].secret_arn, null)
 }
 
 output "rds_secret_name" {
-  description = "The name of the secret in AWS Secrets Manager"
-  value       = aws_secretsmanager_secret.rds_credentials.name
+  description = "The name of the secret in AWS Secrets Manager (automatically managed by RDS). Extract from ARN if needed."
+  value       = try(split(":", aws_db_instance.main.master_user_secret[0].secret_arn)[6], "rds-db-credentials/${var.identifier}")
+}
+
+output "db_connection_info" {
+  description = "Database connection information (retrieve password from Secrets Manager using secret_arn)"
+  value = {
+    host     = aws_db_instance.main.address
+    port     = aws_db_instance.main.port
+    database = aws_db_instance.main.db_name
+    username = aws_db_instance.main.username
+    secret_arn = try(aws_db_instance.main.master_user_secret[0].secret_arn, null)
+  }
 }

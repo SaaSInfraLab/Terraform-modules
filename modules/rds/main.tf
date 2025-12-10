@@ -51,18 +51,6 @@ resource "aws_security_group_rule" "rds_ingress_from_cidr" {
   description       = "Allow database access from CIDR blocks"
 }
 
-resource "random_password" "master_password" {
-  count = var.create_random_password ? 1 : 0
-  
-  length           = 16
-  special          = true
-  override_special = "_%"
-  min_upper        = 1
-  min_lower        = 1
-  min_numeric      = 1
-  min_special      = 1
-}
-
 resource "aws_db_instance" "main" {
   identifier     = var.identifier
   engine         = var.engine
@@ -76,11 +64,9 @@ resource "aws_db_instance" "main" {
   
   db_name  = var.db_name
   username = var.username
-  # Password handling: If create_random_password is true, use random password
-  # Otherwise, use provided password. Use try() to handle case where random_password doesn't exist
-  password = var.create_random_password ? (
-    length(random_password.master_password) > 0 ? random_password.master_password[0].result : var.password
-  ) : var.password
+  # Use AWS Secrets Manager to manage the password automatically
+  # This eliminates the need for password conditionals and prevents Terraform crashes
+  manage_master_user_password = true
   port     = var.db_port
   
   db_subnet_group_name   = aws_db_subnet_group.main.name
@@ -138,17 +124,5 @@ resource "aws_db_parameter_group" "default" {
   tags = var.tags
 }
 
-resource "aws_ssm_parameter" "db_password" {
-  count = var.store_password_in_ssm ? 1 : 0
-  
-  name        = "/${var.name_prefix}/db/password"
-  description = "Database password for ${var.identifier}"
-  type        = "SecureString"
-  value       = aws_db_instance.main.password
-  
-  tags = var.tags
-  
-  lifecycle {
-    ignore_changes = [value]
-  }
-}
+# Password is now managed by AWS Secrets Manager automatically
+# No need for SSM parameter - use the managed secret instead

@@ -68,18 +68,9 @@ variable "username" {
   default     = "dbadmin"
 }
 
-variable "password" {
-  description = "Password for the master DB user. Required unless create_random_password is true"
-  type        = string
-  sensitive   = true
-  default     = null
-}
-
-variable "create_random_password" {
-  description = "Whether to create random password for RDS primary cluster. If false, password must be provided."
-  type        = bool
-  default     = false
-}
+# Password is now managed automatically by AWS Secrets Manager
+# No password variable needed - AWS RDS creates and manages it
+# Applications should retrieve credentials from Secrets Manager using the secret ARN
 
 variable "db_port" {
   description = "The port on which the DB accepts connections"
@@ -199,11 +190,8 @@ variable "db_parameters" {
   default     = []
 }
 
-variable "store_password_in_ssm" {
-  description = "Whether to store the database password in AWS SSM Parameter Store"
-  type        = bool
-  default     = false
-}
+# store_password_in_ssm variable removed - password is now managed by AWS Secrets Manager
+# Use the rds_secret_arn output to retrieve credentials from Secrets Manager
 
 variable "tags" {
   description = "A map of tags to add to all resources"
