@@ -1,7 +1,4 @@
-locals {
-  allowed_security_group_ids = var.allowed_security_group_ids != null ? var.allowed_security_group_ids : []
-  allowed_cidr_blocks        = var.allowed_cidr_blocks != null ? var.allowed_cidr_blocks : []
-}
+# No locals needed - variables have default empty lists
 
 resource "aws_db_subnet_group" "main" {
   name       = "${var.name_prefix}-db-subnet-group"
@@ -30,7 +27,7 @@ resource "aws_security_group" "rds" {
 
 # Security group rules for allowed security groups
 resource "aws_security_group_rule" "rds_ingress_from_sg" {
-  for_each = toset(local.allowed_security_group_ids)
+  for_each = toset(var.allowed_security_group_ids)
   
   type                     = "ingress"
   from_port                = var.db_port
@@ -43,7 +40,7 @@ resource "aws_security_group_rule" "rds_ingress_from_sg" {
 
 # Security group rules for allowed CIDR blocks
 resource "aws_security_group_rule" "rds_ingress_from_cidr" {
-  for_each = toset(local.allowed_cidr_blocks)
+  for_each = toset(var.allowed_cidr_blocks)
   
   type              = "ingress"
   from_port         = var.db_port

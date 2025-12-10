@@ -100,13 +100,13 @@ variable "subnet_ids" {
 variable "allowed_security_group_ids" {
   description = "List of security group IDs allowed to access the database"
   type        = list(string)
-  default     = null
+  default     = []
 }
 
 variable "allowed_cidr_blocks" {
   description = "List of CIDR blocks allowed to access the database"
   type        = list(string)
-  default     = null
+  default     = []
 }
 
 variable "publicly_accessible" {
