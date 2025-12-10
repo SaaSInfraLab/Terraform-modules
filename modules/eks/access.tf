@@ -24,9 +24,6 @@ locals {
     "terraform-executor" = data.aws_caller_identity.executor.arn
   } : {}
 
-  # Create a map of explicitly provided principals (known at plan time)
-  # Filter out the executor ARN if auto-include is enabled to avoid duplicates
-  # Note: Comparison happens at apply time, but Terraform handles this correctly
   explicit_principals_map = {
     for principal in var.cluster_access_principals :
     principal => principal

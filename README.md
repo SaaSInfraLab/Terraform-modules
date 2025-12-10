@@ -5,20 +5,22 @@
 ![Kubernetes](https://img.shields.io/badge/Platform-Kubernetes-326CE5?style=for-the-badge&logo=kubernetes)
 ![Multi-Tenant](https://img.shields.io/badge/Architecture-Multi--Tenant-success?style=for-the-badge)
 
-> **Production-ready, multi-tenant SaaS infrastructure on AWS EKS with complete isolation, security, and cost optimization.**
+> **Pure reusable Terraform modules for multi-tenant SaaS infrastructure on AWS EKS. This repository contains modules only - for complete configuration examples, see [cloudnative-saas-eks](https://github.com/SaaSInfraLab/cloudnative-saas-eks).**
 
-## 🏗️ Architecture Overview
+## 🏗️ Overview
 
-This platform provides a complete multi-tenant SaaS infrastructure solution built on AWS EKS, designed for teams that need secure tenant isolation, resource governance, and scalable operations.
+This repository contains **pure reusable Terraform modules** for building multi-tenant SaaS infrastructure on AWS EKS. These modules are designed to be used from the [cloudnative-saas-eks](https://github.com/SaaSInfraLab/cloudnative-saas-eks) repository, which provides complete configuration examples and deployment guides.
 
-### Key Features
+### Available Modules
 
-- **🚀 Two-Phase Deployment**: Clean separation of infrastructure and application concerns
-- **🏢 Multi-Tenancy**: Complete tenant isolation with resource quotas and network policies  
-- **🛡️ Security First**: RBAC, network policies, encryption, and IAM integration
-- **💰 Cost Optimized**: Free tier compatible with smart resource allocation
-- **📊 Observable**: Built-in monitoring, logging, and alerting
-- **🔧 Production Ready**: Follows AWS and Kubernetes best practices
+- **🌐 VPC**: Network foundation with public/private subnets, NAT gateways, and security groups
+- **🔐 IAM**: Identity and access management with EKS cluster and node roles
+- **☸️ EKS**: Kubernetes cluster with managed node groups and access control
+- **🛡️ Security**: Security groups, network ACLs, and encryption
+- **📊 Monitoring**: CloudWatch Container Insights and logging
+- **🗄️ RDS**: PostgreSQL database with Secrets Manager integration
+- **📦 ECR**: Container registry for Docker images
+- **👥 Multi-Tenancy**: Tenant isolation with namespaces, quotas, and network policies
 
 ---
 
@@ -26,37 +28,18 @@ This platform provides a complete multi-tenant SaaS infrastructure solution buil
 
 ```
 Terraform-modules/
-├── 📚 modules/                     # Reusable Terraform modules
-│   ├── vpc/                        # Network foundation
-│   ├── iam/                        # Identity & access management  
-│   ├── eks/                        # Kubernetes cluster
-│   ├── security/                   # Security groups & policies
-│   ├── monitoring/                 # Observability stack
-│   └── multi-tenancy/              # Tenant isolation
-│
-├── 🏗️ infrastructure/              # Phase 1: Core AWS Resources
-│   ├── main.tf                     # Infrastructure composition
-│   ├── variables.tf                # Configuration parameters
-│   ├── outputs.tf                  # Resource information
-│   ├── terraform.tf                # Terraform/provider requirements
-│   ├── backend.tf                  # State management
-│   └── README.md                   # Phase 1 documentation
-│
-├── 👥 tenants/                     # Phase 2: Multi-Tenancy  
-│   ├── main.tf                     # Tenant configuration
-│   ├── terraform.tf                # Terraform/provider requirements
-│   ├── variables.tf                # Tenant parameters
-│   ├── outputs.tf                  # Tenant information
-│   ├── backend.tf                  # State references
-│   ├── tenants.tfvars.example
-│   └── README.md                   # Phase 2 documentation
-│
-└── 💡 examples/
-    └── dev-environment/            # Complete working example
-        ├── infrastructure.tfvars   # Example infrastructure config
-        ├── tenants.tfvars          # Example tenant config  
-        └── README.md               # Deployment guide
+└── 📚 modules/                     # Reusable Terraform modules
+    ├── vpc/                        # Network foundation
+    ├── iam/                        # Identity & access management  
+    ├── eks/                        # Kubernetes cluster
+    ├── security/                   # Security groups & policies
+    ├── monitoring/                 # Observability stack
+    ├── rds/                        # RDS database
+    ├── ecr/                        # Container registry
+    └── multi-tenancy/              # Tenant isolation
 ```
+
+> **Note**: This repository contains **pure reusable modules only**. For complete configuration examples and deployment guides, see [cloudnative-saas-eks](https://github.com/SaaSInfraLab/cloudnative-saas-eks).
 
 ---
 
@@ -76,24 +59,20 @@ terraform version
 kubectl version --client
 ```
 
-### Manual Deployment (Advanced)
+### Using the Modules
 
-For local development or custom deployment scenarios:
+These modules are designed to be used from the [cloudnative-saas-eks](https://github.com/SaaSInfraLab/cloudnative-saas-eks) repository, which contains all configuration files and examples.
 
-```bash
-# Phase 1: Infrastructure
-cd infrastructure
-terraform init
-terraform apply -var-file="../examples/dev-environment/infrastructure.tfvars"
+Example module usage:
 
-# Phase 2: Tenants  
-cd ../tenants
-terraform init
-terraform apply -var-file="../examples/dev-environment/tenants.tfvars"
-
-# Verify deployment
-kubectl get nodes
-kubectl get namespaces
+```hcl
+module "vpc" {
+  source = "github.com/SaaSInfraLab/Terraform-modules//modules/vpc?ref=main"
+  
+  name_prefix = "my-vpc"
+  vpc_cidr    = "10.0.0.0/16"
+  # ... other variables
+}
 ```
 
 ---
@@ -173,41 +152,14 @@ kubectl get namespaces
 
 ---
 
-## 🔧 Configuration
+## 🔧 Module Usage
 
-### Infrastructure Configuration
-```hcl
-# infrastructure.tfvars
-cluster_name = "saasinfralab-prod"
-cluster_version = "1.32"
-vpc_cidr = "10.0.0.0/16"
+Each module is self-contained and documented. See individual module directories for:
+- Input variables (`variables.tf`)
+- Output values (`outputs.tf`)
+- Resource definitions (`main.tf`)
 
-node_group_config = {
-  instance_types = ["t3.medium", "t3.large"]
-  capacity_type = "SPOT"
-  scaling_config = {
-    desired_size = 3
-    max_size = 10  
-    min_size = 2
-  }
-}
-```
-
-### Tenant Configuration
-```hcl
-# tenants.tfvars
-tenants = [
-  {
-    name = "production-api"
-    namespace = "prod-api"
-    cpu_limit = "50"
-    memory_limit = "100Gi"
-    pod_limit = 500
-    storage_limit = "1Ti"
-    enable_network_policy = true
-  }
-]
-```
+For complete configuration examples, see [cloudnative-saas-eks](https://github.com/SaaSInfraLab/cloudnative-saas-eks).
 
 ---
 
@@ -232,9 +184,8 @@ tenants = [
 
 ## 📚 Documentation
 
-- **[Infrastructure Phase](infrastructure/README.md)**: Phase 1 documentation  
-- **[Tenants Phase](tenants/README.md)**: Phase 2 documentation
-- **[Examples](examples/dev-environment/README.md)**: Working examples
+For complete deployment guides, configuration examples, and usage instructions, see:
+- **[cloudnative-saas-eks](https://github.com/SaaSInfraLab/cloudnative-saas-eks)**: Complete configuration repository with examples and deployment guides
 
 ---
 

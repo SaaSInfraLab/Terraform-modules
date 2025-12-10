@@ -7,12 +7,6 @@ resource "aws_cloudwatch_log_group" "vpc_flow_logs" {
   tags = merge({ Name = "${var.name_prefix}-vpc-flow-logs" }, var.tags)
 }
 
-// IAM role for VPC Flow Logs to publish to CloudWatch Logs
-// NOTE: IAM role for VPC Flow Logs should be created by the iam module
-// and passed via vpc_flow_logs_role_arn variable. If not provided (empty string),
-// this will be created locally for backward compatibility.
-
-// VPC Flow Log sending to CloudWatch Logs
 resource "aws_flow_log" "vpc" {
   count = var.enable_flow_logs ? 1 : 0
 

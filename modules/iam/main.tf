@@ -167,7 +167,6 @@ resource "aws_iam_role" "eks_admin" {
     })
 }
 
-# Developer Role - Edit access (can create/update but not delete critical resources)
 resource "aws_iam_role" "eks_developer" {
     count = var.create_eks_access_roles && length(var.eks_developer_trusted_principals) > 0 ? 1 : 0
     name = "${local.prefix}-eks-developer-role"
