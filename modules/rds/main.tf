@@ -8,28 +8,6 @@ resource "aws_security_group" "rds" {
   name        = "${var.name_prefix}-rds-sg"
   description = "Security group for RDS ${var.engine} instance"
   vpc_id      = var.vpc_id
-  
-  dynamic "ingress" {
-    for_each = var.allowed_security_group_ids != null ? [1] : []
-    content {
-      from_port       = var.db_port
-      to_port         = var.db_port
-      protocol        = "tcp"
-      security_groups = var.allowed_security_group_ids
-      description     = "Allow database access from allowed security groups"
-    }
-  }
-
-  dynamic "ingress" {
-    for_each = var.allowed_cidr_blocks != null ? [1] : []
-    content {
-      from_port   = var.db_port
-      to_port     = var.db_port
-      protocol    = "tcp"
-      cidr_blocks = var.allowed_cidr_blocks
-      description = "Allow database access from CIDR blocks"
-    }
-  }
 
   egress {
     from_port   = 0
@@ -43,6 +21,32 @@ resource "aws_security_group" "rds" {
     var.tags,
     { Name = "${var.name_prefix}-rds-sg" }
   )
+}
+
+# Security group rules for allowed security groups
+resource "aws_security_group_rule" "rds_ingress_from_sg" {
+  count = var.allowed_security_group_ids != null ? length(var.allowed_security_group_ids) : 0
+  
+  type                     = "ingress"
+  from_port                = var.db_port
+  to_port                  = var.db_port
+  protocol                 = "tcp"
+  source_security_group_id = var.allowed_security_group_ids[count.index]
+  security_group_id        = aws_security_group.rds.id
+  description              = "Allow database access from allowed security groups"
+}
+
+# Security group rules for allowed CIDR blocks
+resource "aws_security_group_rule" "rds_ingress_from_cidr" {
+  count = var.allowed_cidr_blocks != null ? length(var.allowed_cidr_blocks) : 0
+  
+  type              = "ingress"
+  from_port         = var.db_port
+  to_port           = var.db_port
+  protocol          = "tcp"
+  cidr_blocks       = [var.allowed_cidr_blocks[count.index]]
+  security_group_id = aws_security_group.rds.id
+  description       = "Allow database access from CIDR blocks"
 }
 
 resource "random_password" "master_password" {
