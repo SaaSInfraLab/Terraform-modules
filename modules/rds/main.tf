@@ -76,7 +76,12 @@ resource "aws_db_instance" "main" {
   
   db_name  = var.db_name
   username = var.username
-  password = var.create_random_password ? random_password.master_password[0].result : var.password
+  # Password: Use random password if enabled, otherwise use provided password
+  # Using coalesce to avoid conditional evaluation of sensitive value during validation
+  password = coalesce(
+    var.create_random_password ? try(random_password.master_password[0].result, null) : null,
+    var.password
+  )
   port     = var.db_port
   
   db_subnet_group_name   = aws_db_subnet_group.main.name
