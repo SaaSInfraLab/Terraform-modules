@@ -71,9 +71,11 @@ output "eks_viewer_role_name" {
 output "secrets_manager_role_arn" {
   description = "ARN of the Secrets Manager IAM role for IRSA"
   value       = try(aws_iam_role.secrets_manager[0].arn, null)
+  # Return null if role wasn't created (e.g., OIDC provider not available)
 }
 
 output "secrets_manager_role_name" {
   description = "Name of the Secrets Manager IAM role for IRSA"
   value       = try(aws_iam_role.secrets_manager[0].name, null)
+  # Return null if role wasn't created (e.g., OIDC provider not available)
 }

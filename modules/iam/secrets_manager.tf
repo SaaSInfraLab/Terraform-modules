@@ -2,7 +2,7 @@
 # IAM: Secrets Manager Role for IRSA
 ####################
 resource "aws_iam_role" "secrets_manager" {
-  count = var.create_secrets_manager_role ? 1 : 0
+  count = var.create_secrets_manager_role && var.oidc_provider_arn != "" && var.oidc_provider_url != "" ? 1 : 0
   name  = "${local.prefix}-secrets-manager-role"
 
   assume_role_policy = jsonencode({
@@ -28,7 +28,7 @@ resource "aws_iam_role" "secrets_manager" {
 }
 
 resource "aws_iam_role_policy" "secrets_manager_policy" {
-  count = var.create_secrets_manager_role ? 1 : 0
+  count = var.create_secrets_manager_role && var.oidc_provider_arn != "" && var.oidc_provider_url != "" ? 1 : 0
   name  = "${local.prefix}-secrets-manager-policy"
   role  = aws_iam_role.secrets_manager[0].id
 
