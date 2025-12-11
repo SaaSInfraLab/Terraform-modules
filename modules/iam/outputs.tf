@@ -67,3 +67,13 @@ output "eks_viewer_role_name" {
   description = "Name of the EKS Viewer IAM role"
   value       = try(aws_iam_role.eks_viewer[0].name, null)
 }
+
+output "secrets_manager_role_arn" {
+  description = "ARN of the Secrets Manager IAM role for IRSA"
+  value       = try(aws_iam_role.secrets_manager[0].arn, null)
+}
+
+output "secrets_manager_role_name" {
+  description = "Name of the Secrets Manager IAM role for IRSA"
+  value       = try(aws_iam_role.secrets_manager[0].name, null)
+}

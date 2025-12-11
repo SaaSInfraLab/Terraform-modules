@@ -69,3 +69,45 @@ variable "aws_region" {
   type        = string
   default     = ""
 }
+
+variable "create_secrets_manager_role" {
+  description = "Whether to create the IAM role for Secrets Manager access via IRSA"
+  type        = bool
+  default     = false
+}
+
+variable "oidc_provider_arn" {
+  description = "ARN of the OIDC provider for IRSA"
+  type        = string
+  default     = ""
+}
+
+variable "oidc_provider_url" {
+  description = "URL of the OIDC provider"
+  type        = string
+  default     = ""
+}
+
+variable "secrets_manager_namespace" {
+  description = "Kubernetes namespace where the service account for Secrets Manager access will be created"
+  type        = string
+  default     = "platform"
+}
+
+variable "secrets_manager_service_account" {
+  description = "Name of the Kubernetes service account for Secrets Manager access"
+  type        = string
+  default     = "backend-sa"
+}
+
+variable "secrets_manager_secret_arns" {
+  description = "List of ARNs of secrets in AWS Secrets Manager that the role can access"
+  type        = list(string)
+  default     = []
+}
+
+variable "secrets_manager_kms_key_arns" {
+  description = "List of ARNs of KMS keys used to encrypt secrets (optional, defaults to AWS managed key)"
+  type        = list(string)
+  default     = []
+}
