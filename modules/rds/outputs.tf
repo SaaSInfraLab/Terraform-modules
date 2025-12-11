@@ -57,8 +57,8 @@ output "rds_secret_arn" {
 }
 
 output "rds_secret_name" {
-  description = "The name of the secret in AWS Secrets Manager (automatically managed by RDS). Extract from ARN if needed."
-  value       = try(split(":", aws_db_instance.main.master_user_secret[0].secret_arn)[6], "rds-db-credentials/${var.identifier}")
+  description = "The name of the secret in AWS Secrets Manager (automatically managed by RDS). AWS uses pattern: rds-db-credentials/<identifier>"
+  value       = "rds-db-credentials/${var.identifier}"
 }
 
 output "db_connection_info" {
