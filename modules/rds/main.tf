@@ -26,6 +26,8 @@ resource "aws_security_group" "rds" {
 }
 
 # Security group rules for allowed security groups
+# Note: If you get "duplicate rule" errors, the rules already exist in AWS.
+# Import them with: terraform import 'module.rds.aws_security_group_rule.rds_ingress_from_sg["<sg-id>"]' <rule-id>
 resource "aws_security_group_rule" "rds_ingress_from_sg" {
   for_each = toset(var.allowed_security_group_ids)
   
